@@ -5,7 +5,7 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  RESOURCE_GROUP: 'myResourceGroupAzureDevOps'
+  RESOURCE_GROUP: 'myResourceGroupAzureDevOps0720'
   LOCATION: 'eastus'
   REPO_URL: 'https://github.com/praveenapril14/azuredevops.git'
   VM_NAME: 'myVMazdevops'
@@ -14,9 +14,9 @@ variables:
   ADMIN_PASSWORD: 'Password123!'
   VNET_NAME: 'myVNetazdevops'
   SUBNET_NAME: 'mySubnetazdevops'
-  NIC_NAME: 'myNicazdevops'
-  STORAGE_ACCOUNT_NAME: 'mystorageaccount2007azdevops'
-  PRIVATE_ENDPOINT_NAME: 'myPrivateEndpointazdevops'
+  NIC_NAME: 'myNicazdevops123'
+  STORAGE_ACCOUNT_NAME: 'mystorageaccount2007azdevops0720'
+  PRIVATE_ENDPOINT_NAME: 'myPrivateEndpointazdevops0720'
 
 stages:
 - stage: CloneRepository
