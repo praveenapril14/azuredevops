@@ -1,0 +1,26 @@
+{
+  "vmName": {
+    "value": "myVM"
+  },
+  "location": {
+    "value": "eastus"
+  },
+  "vmSize": {
+    "value": "Standard_B1s"
+  },
+  "adminUsername": {
+    "value": "azureuser"
+  },
+  "adminPassword": {
+    "value": "Password123!"
+  },
+  "vnetName": {
+    "value": "myVnet"
+  },
+  "subnetName": {
+    "value": "mySubnet"
+  },
+  "nicName": {
+    "value": "myNic"
+  }
+}
