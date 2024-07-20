@@ -1,0 +1,90 @@
+trigger:
+- main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  RESOURCE_GROUP: 'myResourceGroupAzureDevOps'
+  LOCATION: 'eastus'
+  REPO_URL: 'https://github.com/praveenapril14/azuredevops.git'
+  VM_NAME: 'myVM'
+  VM_SIZE: 'Standard_B1s'
+  ADMIN_USERNAME: 'azureuser'
+  ADMIN_PASSWORD: 'Password123!'
+  VNET_NAME: 'myVNet'
+  SUBNET_NAME: 'mySubnet'
+  NIC_NAME: 'myNic'
+  STORAGE_ACCOUNT_NAME: 'mystorageaccount'
+  PRIVATE_ENDPOINT_NAME: 'myPrivateEndpoint'
+
+stages:
+- stage: CloneRepository
+  displayName: 'Clone Repository'
+  jobs:
+  - job: CloneRepo
+    displayName: 'Clone Repository'
+    steps:
+    - checkout: self
+      clean: true
+
+- stage: CreateVirtualNetwork
+  displayName: 'Create Virtual Network'
+  jobs:
+  - job: CreateVNet
+    displayName: 'Create Virtual Network'
+    steps:
+    - script: |
+        az login --service-principal -u $(AZURE_CLIENT_ID) -p $(AZURE_CLIENT_SECRET) --tenant $(AZURE_TENANT_ID)
+        az group create --name $(RESOURCE_GROUP) --location $(LOCATION)
+        az deployment group create --resource-group $(RESOURCE_GROUP) --template-file vnet-template.json --parameters vnetName=$(VNET_NAME) subnetName=$(SUBNET_NAME) location=$(LOCATION)
+      displayName: 'Deploy VNet Template'
+      env:
+        AZURE_CLIENT_ID: $(AZURE_CLIENT_ID)
+        AZURE_CLIENT_SECRET: $(AZURE_CLIENT_SECRET)
+        AZURE_TENANT_ID: $(AZURE_TENANT_ID)
+
+- stage: LaunchVM
+  displayName: 'Launch VM inside Network'
+  jobs:
+  - job: LaunchVMJob
+    displayName: 'Launch VM inside Network'
+    steps:
+    - script: |
+        az login --service-principal -u $(AZURE_CLIENT_ID) -p $(AZURE_CLIENT_SECRET) --tenant $(AZURE_TENANT_ID)
+        az deployment group create --resource-group $(RESOURCE_GROUP) --template-file vm-template.json --parameters vmName=$(VM_NAME) location=$(LOCATION) vmSize=$(VM_SIZE) adminUsername=$(ADMIN_USERNAME) adminPassword=$(ADMIN_PASSWORD) vnetName=$(VNET_NAME) subnetName=$(SUBNET_NAME) nicName=$(NIC_NAME)
+      displayName: 'Deploy VM Template'
+      env:
+        AZURE_CLIENT_ID: $(AZURE_CLIENT_ID)
+        AZURE_CLIENT_SECRET: $(AZURE_CLIENT_SECRET)
+        AZURE_TENANT_ID: $(AZURE_TENANT_ID)
+
+- stage: CreateStorageAccount
+  displayName: 'Create Storage Account'
+  jobs:
+  - job: CreateStorage
+    displayName: 'Create Storage Account'
+    steps:
+    - script: |
+        az login --service-principal -u $(AZURE_CLIENT_ID) -p $(AZURE_CLIENT_SECRET) --tenant $(AZURE_TENANT_ID)
+        az deployment group create --resource-group $(RESOURCE_GROUP) --template-file storage-template.json --parameters storageAccountName=$(STORAGE_ACCOUNT_NAME) location=$(LOCATION)
+      displayName: 'Deploy Storage Account Template'
+      env:
+        AZURE_CLIENT_ID: $(AZURE_CLIENT_ID)
+        AZURE_CLIENT_SECRET: $(AZURE_CLIENT_SECRET)
+        AZURE_TENANT_ID: $(AZURE_TENANT_ID)
+
+- stage: CreatePrivateEndpoint
+  displayName: 'Create Private Endpoint'
+  jobs:
+  - job: CreatePrivateEndpointJob
+    displayName: 'Create Private Endpoint'
+    steps:
+    - script: |
+        az login --service-principal -u $(AZURE_CLIENT_ID) -p $(AZURE_CLIENT_SECRET) --tenant $(AZURE_TENANT_ID)
+        az deployment group create --resource-group $(RESOURCE_GROUP) --template-file private-endpoint-template.json --parameters privateEndpointName=$(PRIVATE_ENDPOINT_NAME) location=$(LOCATION) vnetName=$(VNET_NAME) subnetName=$(SUBNET_NAME) storageAccountName=$(STORAGE_ACCOUNT_NAME)
+      displayName: 'Deploy Private Endpoint Template'
+      env:
+        AZURE_CLIENT_ID: $(AZURE_CLIENT_ID)
+        AZURE_CLIENT_SECRET: $(AZURE_CLIENT_SECRET)
+        AZURE_TENANT_ID: $(AZURE_TENANT_ID)
