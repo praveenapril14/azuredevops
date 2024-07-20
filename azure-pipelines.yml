@@ -8,15 +8,15 @@ variables:
   RESOURCE_GROUP: 'myResourceGroupAzureDevOps'
   LOCATION: 'eastus'
   REPO_URL: 'https://github.com/praveenapril14/azuredevops.git'
-  VM_NAME: 'myVM'
+  VM_NAME: 'myVMazdevops'
   VM_SIZE: 'Standard_B1s'
   ADMIN_USERNAME: 'azureuser'
   ADMIN_PASSWORD: 'Password123!'
-  VNET_NAME: 'myVNet'
-  SUBNET_NAME: 'mySubnet'
-  NIC_NAME: 'myNic'
-  STORAGE_ACCOUNT_NAME: 'mystorageaccount'
-  PRIVATE_ENDPOINT_NAME: 'myPrivateEndpoint'
+  VNET_NAME: 'myVNetazdevops'
+  SUBNET_NAME: 'mySubnetazdevops'
+  NIC_NAME: 'myNicazdevops'
+  STORAGE_ACCOUNT_NAME: 'mystorageaccount2007azdevops'
+  PRIVATE_ENDPOINT_NAME: 'myPrivateEndpointazdevops'
 
 stages:
 - stage: CloneRepository
@@ -37,7 +37,7 @@ stages:
     - script: |
         az login --service-principal -u $(AZURE_CLIENT_ID) -p $(AZURE_CLIENT_SECRET) --tenant $(AZURE_TENANT_ID)
         az group create --name $(RESOURCE_GROUP) --location $(LOCATION)
-        az deployment group create --resource-group $(RESOURCE_GROUP) --template-file vnet-template.json --parameters vnetName=$(VNET_NAME) subnetName=$(SUBNET_NAME) location=$(LOCATION)
+        az deployment group create --resource-group $(RESOURCE_GROUP) --template-file virtualnetwork.json --parameters vnetName=$(VNET_NAME) subnetName=$(SUBNET_NAME) location=$(LOCATION)
       displayName: 'Deploy VNet Template'
       env:
         AZURE_CLIENT_ID: $(AZURE_CLIENT_ID)
@@ -52,7 +52,7 @@ stages:
     steps:
     - script: |
         az login --service-principal -u $(AZURE_CLIENT_ID) -p $(AZURE_CLIENT_SECRET) --tenant $(AZURE_TENANT_ID)
-        az deployment group create --resource-group $(RESOURCE_GROUP) --template-file vm-template.json --parameters vmName=$(VM_NAME) location=$(LOCATION) vmSize=$(VM_SIZE) adminUsername=$(ADMIN_USERNAME) adminPassword=$(ADMIN_PASSWORD) vnetName=$(VNET_NAME) subnetName=$(SUBNET_NAME) nicName=$(NIC_NAME)
+        az deployment group create --resource-group $(RESOURCE_GROUP) --template-file vm-using-vn.json --parameters vmName=$(VM_NAME) location=$(LOCATION) vmSize=$(VM_SIZE) adminUsername=$(ADMIN_USERNAME) adminPassword=$(ADMIN_PASSWORD) vnetName=$(VNET_NAME) subnetName=$(SUBNET_NAME) nicName=$(NIC_NAME)
       displayName: 'Deploy VM Template'
       env:
         AZURE_CLIENT_ID: $(AZURE_CLIENT_ID)
@@ -67,7 +67,7 @@ stages:
     steps:
     - script: |
         az login --service-principal -u $(AZURE_CLIENT_ID) -p $(AZURE_CLIENT_SECRET) --tenant $(AZURE_TENANT_ID)
-        az deployment group create --resource-group $(RESOURCE_GROUP) --template-file storage-template.json --parameters storageAccountName=$(STORAGE_ACCOUNT_NAME) location=$(LOCATION)
+        az deployment group create --resource-group $(RESOURCE_GROUP) --template-file storageaccount.json --parameters storageAccountName=$(STORAGE_ACCOUNT_NAME) location=$(LOCATION)
       displayName: 'Deploy Storage Account Template'
       env:
         AZURE_CLIENT_ID: $(AZURE_CLIENT_ID)
@@ -82,7 +82,7 @@ stages:
     steps:
     - script: |
         az login --service-principal -u $(AZURE_CLIENT_ID) -p $(AZURE_CLIENT_SECRET) --tenant $(AZURE_TENANT_ID)
-        az deployment group create --resource-group $(RESOURCE_GROUP) --template-file private-endpoint-template.json --parameters privateEndpointName=$(PRIVATE_ENDPOINT_NAME) location=$(LOCATION) vnetName=$(VNET_NAME) subnetName=$(SUBNET_NAME) storageAccountName=$(STORAGE_ACCOUNT_NAME)
+        az deployment group create --resource-group $(RESOURCE_GROUP) --template-file private-endpoint.json --parameters privateEndpointName=$(PRIVATE_ENDPOINT_NAME) location=$(LOCATION) vnetName=$(VNET_NAME) subnetName=$(SUBNET_NAME) storageAccountName=$(STORAGE_ACCOUNT_NAME)
       displayName: 'Deploy Private Endpoint Template'
       env:
         AZURE_CLIENT_ID: $(AZURE_CLIENT_ID)
